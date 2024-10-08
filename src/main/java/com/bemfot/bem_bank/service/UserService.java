@@ -1,14 +1,15 @@
 package com.bemfot.bem_bank.service;
 
+import com.bemfot.bem_bank.dto.AccountInfo;
 import com.bemfot.bem_bank.dto.request.UserRequestDto;
 import com.bemfot.bem_bank.dto.response.UserResponseDto;
 import com.bemfot.bem_bank.entity.User;
 import com.bemfot.bem_bank.enums.UserAccountEnum;
+import com.bemfot.bem_bank.exception.BadRequestException;
+import com.bemfot.bem_bank.exception.NotFoundException;
 import com.bemfot.bem_bank.repository.UserRepository;
 import com.bemfot.bem_bank.util.AccountUtils;
-import com.bemfot.bem_bank.util.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.parser.Entity;
@@ -22,9 +23,9 @@ public class UserService {
    public UserService(UserRepository userRepository){
        this.userRepository = userRepository;
    }
-    public ResponseEntity<Object> createUser(UserRequestDto userRequestDto){
+    public UserResponseDto createUser(UserRequestDto userRequestDto){
         if(userRepository.existsByEmail(userRequestDto.getEmail())) {
-           return Response.errorResponse(HttpStatus.BAD_REQUEST, "User already exist");
+           throw  new BadRequestException("User already exist");
         }
         User newUser = User.builder()
                 .firstName(userRequestDto.getFirstName())
@@ -42,7 +43,16 @@ public class UserService {
                 .build();
 
        User savedUser = userRepository.save(newUser);
-       return Response.successResponse("User account created", savedUser, HttpStatus.CREATED);
+       return UserResponseDto.builder()
+               .statusCode("201")
+               .message("User account created")
+               .accountInfo(AccountInfo.builder()
+                       .accountName(savedUser.getFirstName())
+                       .accountNumber(savedUser.getAccountNumber())
+                       .accountBalance(savedUser.getAccountBalance())
+                       .build())
+               .build();
 
     }
+
 }

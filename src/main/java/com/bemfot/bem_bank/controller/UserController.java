@@ -1,6 +1,7 @@
 package com.bemfot.bem_bank.controller;
 
 import com.bemfot.bem_bank.dto.request.UserRequestDto;
+import com.bemfot.bem_bank.dto.response.UserResponseDto;
 import com.bemfot.bem_bank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/create-account")
-    public ResponseEntity<Object> createUser(@RequestBody UserRequestDto userRequestDto){
+    public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto){
         return  userService.createUser(userRequestDto);
     }
 }
